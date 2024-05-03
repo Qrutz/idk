@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { WebSocketContext } from '../components/Layout';
 
 interface LobbyParams {
@@ -12,6 +12,7 @@ export default function Lobby() {
   const [playerName, setPlayerName] = useState('');
   const [isNameSubmitted, setIsNameSubmitted] = useState(false); // New state to track if the name has been submitted
   const inviteLink = `${window.location.origin}/lobby/${id}`;
+  const navigate = useNavigate();
 
   // Handle the form submission, send the join message
   const handleJoin = (e: React.FormEvent) => {
@@ -67,11 +68,20 @@ export default function Lobby() {
         )}
 
       {messages[messages.length - 1]?.type === 'result' && (
-        <p>
-          {messages[messages.length - 1].win === true
-            ? 'You won sir'
-            : 'You lost sir'}
-        </p>
+        <div className='flex flex-col gap-2'>
+          <p>
+            {messages[messages.length - 1].win === true
+              ? 'You won sir'
+              : 'You lost sir'}
+          </p>
+
+          <button
+            className='bg-blue-500 text-white px-4 py-2 rounded'
+            onClick={() => navigate('/')}
+          >
+            EXIT
+          </button>
+        </div>
       )}
 
       {messages[messages.length - 1]?.type === 'status' &&
