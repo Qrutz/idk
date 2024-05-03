@@ -2,10 +2,16 @@
 import React, { useEffect, useState, createContext, ReactNode } from 'react';
 
 // Define the type for the WebSocket context
-type WebSocketContextType = WebSocket | null;
+type WebSocketContextType = {
+  socket: WebSocket | null;
+  messages: unknown[];
+  send: (data: string | object) => void;
+};
 
 // Create WebSocket context with TypeScript
-export const WebSocketContext = createContext<WebSocketContextType>(null);
+export const WebSocketContext = createContext<WebSocketContextType | undefined>(
+  undefined
+);
 
 interface LayoutProps {
   children?: ReactNode;
@@ -13,6 +19,8 @@ interface LayoutProps {
 
 const SocketConnection: React.FC<LayoutProps> = ({ children }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  // track game lobby responses, move to zustand or some shit later
+  const [messages, setMessages] = useState<unknown[]>([]);
 
   useEffect(() => {
     console.log('Connecting to WebSocket...');
@@ -24,6 +32,8 @@ const SocketConnection: React.FC<LayoutProps> = ({ children }) => {
 
     newSocket.onmessage = (message: MessageEvent) => {
       console.log('Received message: ', message.data);
+      const messageResponse = JSON.parse(message.data);
+      setMessages((prev) => [...prev, messageResponse]);
     };
 
     newSocket.onerror = (event: Event) => {
@@ -48,8 +58,14 @@ const SocketConnection: React.FC<LayoutProps> = ({ children }) => {
     };
   }, []);
 
+  const send = (data: string | object) => {
+    if (socket) {
+      socket.send(JSON.stringify(data));
+    }
+  };
+
   return (
-    <WebSocketContext.Provider value={socket}>
+    <WebSocketContext.Provider value={{ socket, messages, send }}>
       {children}
     </WebSocketContext.Provider>
   );
