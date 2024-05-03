@@ -3,6 +3,11 @@ import websockets
 import json
 import random
 import uuid
+import logging
+
+logger = logging.getLogger("websockets")
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
 
 games = {}
 
@@ -55,10 +60,34 @@ class GameRoom:
         await second_player.send(json.dumps(second_player_msg))
 
 
+# async def process_request(path, request_headers):
+#     """
+#     Handle CORS policy for WebSocket by allowing origins that match your criteria.
+#     """
+#     if "Origin" in request_headers:
+#         # You might want to validate the origin here and adjust "Allow-Origin" accordingly.
+#         response_headers = [
+#             (
+#                 "Access-Control-Allow-Origin",
+#                 "*",
+#             ),  # Be more specific in production!
+#             ("Access-Control-Allow-Methods", "OPTIONS, GET"),
+#             ("Access-Control-Allow-Headers", "Content-Type"),
+#         ]
+#         return 200, response_headers
+#     return None
+
+
+async def main():
+    async with websockets.serve(handler, "localhost", 6789):
+        await asyncio.Future()  # run forever
+
+
 async def handler(websocket, path):
     try:
         async for message in websocket:
             data = json.loads(message)
+            print(data)
             if data["type"] == "create":
                 room_id = str(uuid.uuid4())  # Generate a unique room ID
                 games[room_id] = GameRoom(room_id)
@@ -86,7 +115,6 @@ async def handler(websocket, path):
                             )
                         )
                         if len(games[room_id].players) == 2:
-                            # Notify the first player to choose
                             await next(iter(games[room_id].players)).send(
                                 json.dumps(
                                     {"type": "status", "message": "Your turn to choose"}
@@ -114,6 +142,5 @@ async def handler(websocket, path):
                 break
 
 
-start_server = websockets.serve(handler, "localhost", 6789)
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
+if __name__ == "__main__":
+    asyncio.run(main())
