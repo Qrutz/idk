@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { WebSocketContext } from '../components/Layout';
 
 interface LobbyParams {
@@ -8,44 +8,99 @@ interface LobbyParams {
 
 export default function Lobby() {
   const { id } = useParams<LobbyParams>();
-  const navigate = useNavigate();
   const { send, messages } = useContext(WebSocketContext);
-  const [player2hasJoined, setPlayer2hasJoined] = React.useState(false);
+  const [playerName, setPlayerName] = useState('');
+  const [isNameSubmitted, setIsNameSubmitted] = useState(false); // New state to track if the name has been submitted
   const inviteLink = `${window.location.origin}/lobby/${id}`;
 
-  // Effect for sending the initial join message
-  useEffect(() => {
-    // Send join message for player1
-    send({ type: 'join', room: id, name: 'player1' });
-  }, []); // Only re-run if `id` or `send` changes
+  // Handle the form submission, send the join message
+  const handleJoin = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent the form from submitting in the traditional way
+    if (playerName.trim()) {
+      send({ type: 'join', room: id, name: playerName });
+      setIsNameSubmitted(true); // Set name as submitted after sending join request
+    }
+  };
 
-  //   useEffect(() => {
-  //     const latestMessage = messages[messages.length - 1];
-  //     if (
-  //       latestMessage &&
-  //       latestMessage.type === 'join' &&
-  //       latestMessage.name !== 'player1'
-  //     ) {
-  //       console.log('Player 2 has prolly joined:', latestMessage);
-  //       setPlayer2hasJoined(true);
-  //     }
-  //   }, [messages]);
+  useEffect(() => {
+    const latestMessage = messages[messages.length - 1];
+    if (
+      latestMessage &&
+      latestMessage.type === 'status' &&
+      latestMessage.message === 'Your turn to choose'
+    ) {
+      console.log('Pick heads or tails');
+    }
+  }, [messages]);
 
   return (
-    <div className='flex flex-col'>
-      <span className='flex gap-2'>
-        <h1>COINTOSSSHIT</h1>
-        <h2>Room ID: {id}</h2>
-      </span>
+    <div className='flex flex-col items-center justify-center p-4'>
+      <h1>COINTOSSSHIT</h1>
 
-      <p>
-        Share this link to invite the second player:{' '}
-        <a href={inviteLink}>{inviteLink}</a>
-      </p>
-      {player2hasJoined ? (
-        <p>Player 2 has joined. Starting game...</p>
-      ) : (
-        <p>Waiting for Player 2 to join...</p>
+      {!isNameSubmitted && ( // Check if name is submitted before hiding form
+        <form onSubmit={handleJoin} className='flex flex-col items-center'>
+          <input
+            type='text'
+            placeholder='Enter your name'
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            className='mb-2 p-2 border'
+          />
+          <button
+            type='submit'
+            className='bg-blue-500 text-white px-4 py-2 rounded'
+          >
+            Join Game
+          </button>
+        </form>
+      )}
+
+      {messages[messages.length - 1]?.type === 'status' &&
+        messages[messages.length - 1]?.message ===
+          'Waiting for another player...' && (
+          <p>
+            Share this link to invite the second player:{' '}
+            <a href={inviteLink} target='_blank' rel='noopener noreferrer'>
+              {inviteLink}
+            </a>
+          </p>
+        )}
+
+      {messages[messages.length - 1]?.type === 'result' && (
+        <p>
+          {messages[messages.length - 1].win === true
+            ? 'You won sir'
+            : 'You lost sir'}
+        </p>
+      )}
+
+      {messages[messages.length - 1]?.type === 'status' &&
+        messages[messages.length - 1]?.message === 'Your turn to choose' && (
+          <div className='flex flex-col items-center'>
+            {' '}
+            {/* Display heads or tails buttons */}
+            <button
+              className='bg-blue-500 text-white px-4 py-2 rounded'
+              onClick={() =>
+                send({ type: 'choice', room: id, choice: 'heads' })
+              }
+            >
+              Heads
+            </button>
+            <button
+              className='bg-blue-500 text-white px-4 py-2 rounded'
+              onClick={() =>
+                send({ type: 'choice', room: id, choice: 'tails' })
+              }
+            >
+              Tails
+            </button>
+          </div>
+        )}
+
+      {/* Display game status based on WebSocket messages */}
+      {messages[messages.length - 1]?.type === 'status' && (
+        <p>{messages[messages.length - 1].message}</p>
       )}
     </div>
   );
