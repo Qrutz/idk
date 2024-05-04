@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useWebSocket } from '../hooks/useWebSocket';
 import heads from '../assets/heads.png';
 import tails from '../assets/tails2.png';
-import { motion } from 'framer-motion';
 import Coin from '../components/Coin';
 import ClickToCopy from '../components/InviteLinkComponent';
 import CoinToss from '../components/CoinToss';

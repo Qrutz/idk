@@ -2,8 +2,6 @@ import { useEffect } from 'react';
 import './App.css';
 import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from './hooks/useWebSocket';
-import CoinToss from './components/CoinToss';
-import { motion } from 'framer-motion';
 
 function App() {
   const { send, messages } = useWebSocket();
