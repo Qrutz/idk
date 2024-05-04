@@ -106,7 +106,7 @@ export default function Lobby() {
 
       {/* Display game status based on WebSocket messages */}
       {messages[messages.length - 1]?.type === 'status' && (
-        <p className='mt-3'>{messages[messages.length - 1].message}</p>
+        <p className=''>{messages[messages.length - 1].message}</p>
       )}
     </div>
   );
