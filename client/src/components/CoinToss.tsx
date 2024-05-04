@@ -18,7 +18,7 @@ const CoinToss: React.FC<CoinTossProps> = ({ result, win }) => {
       setAnimateFlip(true);
       setTimeout(() => {
         setAnimateFlip(false);
-        setDisplayResult(win ? 'You won sir' : 'You lost sir');
+        setDisplayResult(win ? 'YOU WON SIR' : 'YOU LOST SIR');
       }, 2000); // Duration of the flip animation matches timeout
     }
   }, [result, win]);
@@ -39,6 +39,9 @@ const CoinToss: React.FC<CoinTossProps> = ({ result, win }) => {
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      {displayResult && (
+        <h3 className='text-2xl mb-10 font-bold'>{displayResult}</h3>
+      )}
       <motion.div
         initial='initial'
         animate={animateFlip ? 'animate' : 'initial'}
@@ -56,7 +59,6 @@ const CoinToss: React.FC<CoinTossProps> = ({ result, win }) => {
           style={{ width: '200px', height: '200px' }}
         />
       </motion.div>
-      {displayResult && <h3>{displayResult}</h3>}
     </div>
   );
 };
