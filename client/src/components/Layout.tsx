@@ -4,8 +4,15 @@ import React, { useEffect, useState, createContext, ReactNode } from 'react';
 // Define the type for the WebSocket context
 type WebSocketContextType = {
   socket: WebSocket | null;
-  messages: unknown[];
+  messages: Message[];
   send: (data: string | object) => void;
+};
+
+type Message = {
+  type: string;
+  room?: string;
+  message?: string;
+  win?: boolean;
 };
 
 // Create WebSocket context with TypeScript
@@ -20,11 +27,11 @@ interface LayoutProps {
 const SocketConnection: React.FC<LayoutProps> = ({ children }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   // track game lobby responses, move to zustand or some shit later
-  const [messages, setMessages] = useState<unknown[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     console.log('Connecting to WebSocket...');
-    const newSocket = new WebSocket('ws://localhost:6789');
+    const newSocket = new WebSocket('ws://95.141.241.150:6789');
 
     newSocket.onopen = () => {
       console.log('WebSocket connection established');

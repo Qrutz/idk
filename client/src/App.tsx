@@ -1,10 +1,10 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import './App.css';
-import { WebSocketContext } from './components/Layout';
 import { useNavigate } from 'react-router-dom';
+import { useWebSocket } from './hooks/useWebSocket';
 
 function App() {
-  const { send, messages } = useContext(WebSocketContext);
+  const { send, messages } = useWebSocket();
   const navigate = useNavigate();
 
   useEffect(() => {

@@ -1,14 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { WebSocketContext } from '../components/Layout';
-
-interface LobbyParams {
-  id: string;
-}
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useWebSocket } from '../hooks/useWebSocket';
 
 export default function Lobby() {
-  const { id } = useParams<LobbyParams>();
-  const { send, messages } = useContext(WebSocketContext);
+  const { id } = useParams();
+  const { send, messages } = useWebSocket();
   const [playerName, setPlayerName] = useState('');
   const [isNameSubmitted, setIsNameSubmitted] = useState(false); // New state to track if the name has been submitted
   const inviteLink = `${window.location.origin}/lobby/${id}`;

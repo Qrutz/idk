@@ -53,7 +53,7 @@ class GameRoom:
 
 
 async def main():
-    async with websockets.serve(handler, "localhost", 6789):
+    async with websockets.serve(handler, "0.0.0.0", 6789):
         await asyncio.Future()  # run forever
 
 
