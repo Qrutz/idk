@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import './App.css';
 import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from './hooks/useWebSocket';
+import CoinToss from './components/CoinToss';
+import { motion } from 'framer-motion';
 
 function App() {
   const { send, messages } = useWebSocket();
@@ -21,7 +23,7 @@ function App() {
 
   return (
     <>
-      <button onClick={() => createGame()}>Create</button>
+      <button onClick={() => createGame()}>Create Game</button>
     </>
   );
 }

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useWebSocket } from '../hooks/useWebSocket';
+import heads from '../assets/heads.png';
+import tails from '../assets/tails2.png';
+import { motion } from 'framer-motion';
+import Coin from '../components/Coin';
+import ClickToCopy from '../components/InviteLinkComponent';
 
 export default function Lobby() {
   const { id } = useParams();
@@ -32,8 +37,6 @@ export default function Lobby() {
 
   return (
     <div className='flex flex-col items-center justify-center p-4'>
-      <h1>COINTOSSSHIT</h1>
-
       {!isNameSubmitted && ( // Check if name is submitted before hiding form
         <form onSubmit={handleJoin} className='flex flex-col items-center'>
           <input
@@ -55,12 +58,13 @@ export default function Lobby() {
       {messages[messages.length - 1]?.type === 'status' &&
         messages[messages.length - 1]?.message ===
           'Waiting for another player...' && (
-          <p>
-            Share this link to invite the second player:{' '}
-            <a href={inviteLink} target='_blank' rel='noopener noreferrer'>
-              {inviteLink}
-            </a>
-          </p>
+          <div className='flex flex-col gap-2'>
+            <h2 className='text-3xl'>
+              {' '}
+              Share this link to invite the second player:{' '}
+            </h2>
+            <ClickToCopy link={inviteLink} />
+          </div>
         )}
 
       {messages[messages.length - 1]?.type === 'result' && (
@@ -82,31 +86,27 @@ export default function Lobby() {
 
       {messages[messages.length - 1]?.type === 'status' &&
         messages[messages.length - 1]?.message === 'Your turn to choose' && (
-          <div className='flex flex-col items-center'>
+          <div className='flex gap-4 items-center'>
             {' '}
             {/* Display heads or tails buttons */}
-            <button
-              className='bg-blue-500 text-white px-4 py-2 rounded'
-              onClick={() =>
-                send({ type: 'choice', room: id, choice: 'heads' })
-              }
-            >
-              Heads
-            </button>
-            <button
-              className='bg-blue-500 text-white px-4 py-2 rounded'
-              onClick={() =>
-                send({ type: 'choice', room: id, choice: 'tails' })
-              }
-            >
-              Tails
-            </button>
+            <Coin
+              onClick={() => {
+                send({ type: 'choice', room: id, choice: 'heads' });
+              }}
+              Image={heads}
+            />
+            <Coin
+              onClick={() => {
+                send({ type: 'choice', room: id, choice: 'tails' });
+              }}
+              Image={tails}
+            />
           </div>
         )}
 
       {/* Display game status based on WebSocket messages */}
       {messages[messages.length - 1]?.type === 'status' && (
-        <p>{messages[messages.length - 1].message}</p>
+        <p className='mt-3'>{messages[messages.length - 1].message}</p>
       )}
     </div>
   );
