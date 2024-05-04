@@ -6,6 +6,7 @@ import tails from '../assets/tails2.png';
 import { motion } from 'framer-motion';
 import Coin from '../components/Coin';
 import ClickToCopy from '../components/InviteLinkComponent';
+import CoinToss from '../components/CoinToss';
 
 export default function Lobby() {
   const { id } = useParams();
@@ -69,11 +70,10 @@ export default function Lobby() {
 
       {messages[messages.length - 1]?.type === 'result' && (
         <div className='flex flex-col gap-2'>
-          <p>
-            {messages[messages.length - 1].win === true
-              ? 'You won sir'
-              : 'You lost sir'}
-          </p>
+          <CoinToss
+            result={messages[messages.length - 1]?.outcome}
+            win={messages[messages.length - 1].win}
+          />
 
           <button
             className='bg-blue-500 text-white px-4 py-2 rounded'

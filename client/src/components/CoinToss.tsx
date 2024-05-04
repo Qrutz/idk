@@ -1,25 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import heads from '../assets/heads.png';
 import tails from '../assets/tails2.png';
 
 interface CoinTossProps {
-  onFlip: () => void; // Callback function to signal that a flip has started
-  onFinish: (result: boolean) => void; // Callback function to return the result
-  isFlipping: boolean; // State to control whether the coin is flipping
+  result: boolean; // true for tails, false for heads
+  win: boolean | undefined; // true if the player won
 }
 
-const CoinToss: React.FC<CoinTossProps> = ({
-  onFlip,
-  onFinish,
-  isFlipping,
-}) => {
+const CoinToss: React.FC<CoinTossProps> = ({ result, win }) => {
+  const [animateFlip, setAnimateFlip] = useState(false);
+  const [displayResult, setDisplayResult] = useState('');
+
+  useEffect(() => {
+    // Trigger flip animation when result is received
+    if (result !== undefined) {
+      setAnimateFlip(true);
+      setTimeout(() => {
+        setAnimateFlip(false);
+        setDisplayResult(win ? 'You won sir' : 'You lost sir');
+      }, 2000); // Duration of the flip animation matches timeout
+    }
+  }, [result, win]);
+
   const flipAnimation = {
     initial: { scale: 1, y: 0, rotateY: 0 },
     animate: {
       scale: [1, 1.2, 1],
       y: [0, -300, 0],
-      rotateY: [0, 7200], // Multiple fast rotations
+      rotateY: [0, 3600], // Making it really fast to mimic a blur
       transition: {
         scale: { duration: 2, times: [0, 0.5, 1] },
         y: { type: 'spring', stiffness: 170, damping: 8, duration: 2 },
@@ -28,22 +37,13 @@ const CoinToss: React.FC<CoinTossProps> = ({
     },
   };
 
-  React.useEffect(() => {
-    if (isFlipping) {
-      onFlip();
-      const result = Math.random() < 0.5;
-      setTimeout(() => onFinish(result), 2000); // Adjust the time to match the length of the animation
-    }
-  }, [isFlipping, onFlip, onFinish]);
-
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       <motion.div
         initial='initial'
-        animate={isFlipping ? 'animate' : 'initial'}
+        animate={animateFlip ? 'animate' : 'initial'}
         variants={flipAnimation}
         style={{
-          cursor: 'pointer',
           width: '200px',
           height: '200px',
           position: 'relative',
@@ -51,11 +51,12 @@ const CoinToss: React.FC<CoinTossProps> = ({
         }}
       >
         <img
-          src={isFlipping ? heads : tails} // Assuming you start with heads
-          alt='coin'
+          src={result ? tails : heads}
+          alt={result ? 'Tails' : 'Heads'}
           style={{ width: '200px', height: '200px' }}
         />
       </motion.div>
+      {displayResult && <h3>{displayResult}</h3>}
     </div>
   );
 };

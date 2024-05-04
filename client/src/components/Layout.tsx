@@ -9,6 +9,7 @@ type WebSocketContextType = {
 };
 
 type Message = {
+  outcome: boolean;
   type: string;
   room?: string;
   message?: string;
